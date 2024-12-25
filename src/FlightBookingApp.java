@@ -75,6 +75,9 @@ public class FlightBookingApp {
         bookingFrame.getContentPane().setBackground(new Color(236, 240, 241)); // Light gray background
         bookingFrame.setLocationRelativeTo(null);
 
+        JPanel mainFormPanel = new JPanel();
+        mainFormPanel.setLayout(new BoxLayout(mainFormPanel, BoxLayout.Y_AXIS));
+
         // Header Panel
         JPanel headerPanel = new JPanel();
         headerPanel.setBackground(new Color(41, 128, 185)); // Dark blue background
@@ -86,9 +89,6 @@ public class FlightBookingApp {
         // Form Panel
         JPanel formPanel = new JPanel(new GridBagLayout());
         formPanel.setBackground(new Color(236, 240, 241));
-        GridBagConstraints gbc = new GridBagConstraints();
-        gbc.insets = new Insets(3, 3, 3, 3);
-        gbc.anchor = GridBagConstraints.WEST;
 
         JLabel nameLabel = new JLabel("Passenger Name:");
         taruhKomponen(nameLabel, formPanel, 0, 0, 1, 1);
@@ -150,17 +150,30 @@ public class FlightBookingApp {
         JTextField ticketField = new JTextField(5);
         taruhKomponen(ticketField, formPanel, 1, 8, 1, 1);
 
-        JButton submitButton = new JButton("Book Ticket");
-        submitButton.setBackground(new Color(46, 204, 113)); // Green button
-        submitButton.setForeground(Color.WHITE);
-        submitButton.setFont(new Font("Arial", Font.BOLD, 16));
-        taruhKomponen(submitButton, formPanel, 1, 9, 1, 1);
+        JPanel buttonsPanel = new JPanel();
+        buttonsPanel.setLayout(new BoxLayout(buttonsPanel, BoxLayout.X_AXIS));
 
         JButton backButton = new JButton("Back");
         backButton.setBackground(new Color(192, 57, 43)); // Red button
         backButton.setForeground(Color.WHITE);
         backButton.setFont(new Font("Arial", Font.BOLD, 16));
-        taruhKomponen(backButton, formPanel, 0, 9, 1, 1);
+        taruhKomponen(backButton, buttonsPanel, 0, 0, 1, 1);
+
+        buttonsPanel.add(Box.createHorizontalStrut(20));
+
+        JButton submitButton = new JButton("Book Ticket");
+        submitButton.setBackground(new Color(46, 204, 113)); // Green button
+        submitButton.setForeground(Color.WHITE);
+        submitButton.setFont(new Font("Arial", Font.BOLD, 16));
+        taruhKomponen(submitButton, buttonsPanel, 1, 0, 1, 1);
+
+        buttonsPanel.add(Box.createHorizontalStrut(20));
+
+        JButton deleteButton = new JButton("Delete");
+        deleteButton.setBackground(new Color(192, 57, 43)); // Red button
+        deleteButton.setForeground(Color.WHITE);
+        deleteButton.setFont(new Font("Arial", Font.BOLD, 16));
+        taruhKomponen(deleteButton, buttonsPanel, 2, 0, 1, 1);
 
         // Table to display bookings
         String[] columnNames = {"Name", "From", "To", "Class", "Airline", "Day", "Date", "Time", "Tickets", "Total Price", "Ticket Code"};
@@ -169,10 +182,13 @@ public class FlightBookingApp {
         JScrollPane tableScrollPane = new JScrollPane(bookingTable);
 
         // Add panels to booking frame
-        bookingFrame.add(headerPanel, BorderLayout.NORTH);
-        bookingFrame.add(formPanel, BorderLayout.CENTER);
-        bookingFrame.add(tableScrollPane, BorderLayout.SOUTH);
-        bookingFrame.setVisible(false);  // Hide booking frame initially
+        mainFormPanel.add(headerPanel);
+        mainFormPanel.add(formPanel);
+        mainFormPanel.add(Box.createVerticalStrut(20));
+        mainFormPanel.add(buttonsPanel);
+        mainFormPanel.add(Box.createVerticalStrut(20));
+        mainFormPanel.add(tableScrollPane);
+        bookingFrame.setContentPane(mainFormPanel);
 
         // Check-In Frame
         JFrame checkInFrame = new JFrame("Flight Check-In");
@@ -297,6 +313,40 @@ public class FlightBookingApp {
                         JOptionPane.showMessageDialog(null, "Unknown Error" + exc);
                     }
                 }
+            }
+        });
+
+        deleteButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                JDialog dialogDeleteRow = new JDialog((Frame) null, "Remove Row", true);
+                dialogDeleteRow.setLayout(new FlowLayout());
+
+                JLabel labelInputCode = new JLabel("Enter Ticket Code");
+                JTextField fieldInputCode = new JTextField(10);
+                JButton buttonRemove = new JButton("Remove");
+
+                dialogDeleteRow.add(labelInputCode);
+                dialogDeleteRow.add(fieldInputCode);
+                dialogDeleteRow.add(buttonRemove);
+
+                buttonRemove.addActionListener(new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        String ticketInput = fieldInputCode.getText().trim();
+
+                        if (ticketInput.isEmpty()){
+                            JOptionPane.showMessageDialog(null, "Input Cannot Empty");
+                            return;
+                        }
+
+                    }
+                });
+
+                dialogDeleteRow.setSize(300, 150);
+                dialogDeleteRow.setLocationRelativeTo(null);
+                dialogDeleteRow.setVisible(true);
+
             }
         });
     }
