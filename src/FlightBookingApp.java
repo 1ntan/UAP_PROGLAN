@@ -340,6 +340,24 @@ public class FlightBookingApp {
                             return;
                         }
 
+                        if (bookingData.containsKey(ticketInput)) {
+                            // Remove from Map
+                            bookingData.remove(ticketInput);
+
+                            // Remove from Table
+                            for (int i = 0; i < tableModel.getRowCount(); i++) {
+                                if (tableModel.getValueAt(i, 10).equals(ticketInput)) {
+                                    tableModel.removeRow(i);
+                                    break;
+                                }
+                            }
+
+                            JOptionPane.showMessageDialog(null, "Row removed successfully!", "Success", JOptionPane.INFORMATION_MESSAGE);
+                            dialogDeleteRow.dispose(); // Close dialog after successful removal
+                        } else {
+                            JOptionPane.showMessageDialog(null, "Ticket code not found!", "Error", JOptionPane.ERROR_MESSAGE);
+                        }
+
                     }
                 });
 
