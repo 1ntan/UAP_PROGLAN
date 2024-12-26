@@ -9,7 +9,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class FlightBookingApp {
-    private static DefaultTableModel tableModel;
     private static Map<String, String[]> bookingData = new HashMap<>();
 
     public static void main(String[] args) {
@@ -154,7 +153,7 @@ public class FlightBookingApp {
         buttonsPanel.setLayout(new BoxLayout(buttonsPanel, BoxLayout.X_AXIS));
 
         JButton backButton = new JButton("Back");
-        backButton.setBackground(new Color(192, 57, 43)); // Red button
+        backButton.setBackground(new Color(0, 0, 0));
         backButton.setForeground(Color.WHITE);
         backButton.setFont(new Font("Arial", Font.BOLD, 16));
         taruhKomponen(backButton, buttonsPanel, 0, 0, 1, 1);
@@ -169,15 +168,23 @@ public class FlightBookingApp {
 
         buttonsPanel.add(Box.createHorizontalStrut(20));
 
+        JButton updateButton = new JButton("Update");
+        updateButton.setBackground(new Color(0, 115,255));
+        updateButton.setForeground(Color.WHITE);
+        updateButton.setFont(new Font("Arial", Font.BOLD, 16));
+        taruhKomponen(updateButton, buttonsPanel, 2, 0, 1, 1);
+
+        buttonsPanel.add(Box.createHorizontalStrut(20));
+
         JButton deleteButton = new JButton("Delete");
         deleteButton.setBackground(new Color(192, 57, 43)); // Red button
         deleteButton.setForeground(Color.WHITE);
         deleteButton.setFont(new Font("Arial", Font.BOLD, 16));
-        taruhKomponen(deleteButton, buttonsPanel, 2, 0, 1, 1);
+        taruhKomponen(deleteButton, buttonsPanel, 3, 0, 1, 1);
 
         // Table to display bookings
         String[] columnNames = {"Name", "From", "To", "Class", "Airline", "Day", "Date", "Time", "Tickets", "Total Price", "Ticket Code"};
-        tableModel = new DefaultTableModel(columnNames, 0);
+        DefaultTableModel tableModel = new DefaultTableModel(columnNames, 0);
         JTable bookingTable = new JTable(tableModel);
         JScrollPane tableScrollPane = new JScrollPane(bookingTable);
 
@@ -289,11 +296,7 @@ public class FlightBookingApp {
                     try {
                         int numTickets = Integer.parseInt(stringTiket);
                         String ticketCode = "TK" + (int) (Math.random() * 1000000);
-                        double pricePerTicket = 100.00; // Sample price
-                        if (flightDay.equals("Saturday") || flightDay.equals("Sunday")) {
-                            pricePerTicket *= 1.2; // Increase price by 20% on weekends
-                        }
-                        double totalPrice = pricePerTicket * numTickets;
+                        double totalPrice = calculatePrice(flightDay, numTickets);
 
                         String[] row = {name, departure, destination, flightClass, airline, flightDay,
                                 new SimpleDateFormat("yyyy-MM-dd").format(flightDate), flightTime,
@@ -308,11 +311,99 @@ public class FlightBookingApp {
                         ticketField.setText("");
                         timeField.setText("");
                     } catch (NumberFormatException nfe) {
-                        JOptionPane.showMessageDialog(null, "Number of Tickets must be numeric");
+                        JOptionPane.showMessageDialog(null, "Number of tickets must be numeric");
                     } catch (Exception exc) {
                         JOptionPane.showMessageDialog(null, "Unknown Error" + exc);
                     }
                 }
+            }
+        });
+
+        updateButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                JDialog dialogUpdateRow = new JDialog((Frame) null, "Update Row");
+                dialogUpdateRow.setLayout(new GridLayout(6, 2));
+
+                JLabel labelTicketCode = new JLabel("Ticket Code");
+                JTextField fieldTicketCode = new JTextField(10);
+
+                JLabel labelPassangerName = new JLabel("New Name");
+                JTextField filedPassangerName = new JTextField(10);
+
+                JLabel labelFlightTime = new JLabel("New Flight Time");
+                JTextField fieldFlightTime = new JTextField(10);
+
+                JLabel labelNumberTicket = new JLabel("New Number of Ticket");
+                JTextField fieldNumberTicket = new JTextField(10);
+
+                JButton buttonUpdate = new JButton("Update");
+
+                dialogUpdateRow.add(labelTicketCode);
+                dialogUpdateRow.add(fieldTicketCode);
+                dialogUpdateRow.add(labelPassangerName);
+                dialogUpdateRow.add(filedPassangerName);
+                dialogUpdateRow.add(labelFlightTime);
+                dialogUpdateRow.add(fieldFlightTime);
+                dialogUpdateRow.add(labelNumberTicket);
+                dialogUpdateRow.add(fieldNumberTicket);
+                dialogUpdateRow.add(new JLabel());
+                dialogUpdateRow.add(new JLabel());
+
+                dialogUpdateRow.add(buttonUpdate);
+
+                buttonUpdate.addActionListener(new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        String ticketCodeInput = fieldTicketCode.getText().trim();
+                        String passangerNameInput = filedPassangerName.getText().trim();
+                        String flightTimeInput = fieldFlightTime.getText().trim();
+                        String numberTicketInput = fieldNumberTicket.getText().trim();
+
+                        if (ticketCodeInput.isEmpty() || passangerNameInput.isEmpty() || flightTimeInput.isEmpty() || numberTicketInput.isEmpty()) {
+                            JOptionPane.showMessageDialog(null, "Input Cannot Empty");
+                            return;
+                        }
+
+                        if (bookingData.containsKey(ticketCodeInput)) {
+                            try {
+                                String[] detailRow = bookingData.get(ticketCodeInput);
+                                detailRow[0] = passangerNameInput;
+                                detailRow[7] = flightTimeInput;
+
+                                int numTickets = Integer.parseInt(numberTicketInput);
+
+                                detailRow[8] = String.valueOf(numTickets);
+                                double newPrice = calculatePrice(detailRow[5], numTickets);
+                                detailRow[9] = String.valueOf(newPrice);
+
+                                bookingData.put(ticketCodeInput, detailRow);
+
+                                // Update Table
+                                for (int i = 0; i < tableModel.getRowCount(); i++) {
+                                    if (tableModel.getValueAt(i, 10).equals(ticketCodeInput)) {
+                                        tableModel.setValueAt(passangerNameInput, i, 0);
+                                        tableModel.setValueAt(flightTimeInput, i, 7);
+                                        tableModel.setValueAt(numberTicketInput, i, 8);
+                                        tableModel.setValueAt(newPrice, i, 9);
+                                        break;
+                                    }
+                                }
+
+                                JOptionPane.showMessageDialog(null, "Row updated succesfully!", "Success", JOptionPane.INFORMATION_MESSAGE);
+                                dialogUpdateRow.dispose();
+                            } catch (NumberFormatException nfe) {
+                                JOptionPane.showMessageDialog(null, "Number of ticket must be numeric");
+                            }
+                        } else {
+                            JOptionPane.showMessageDialog(null, "Ticket code not found!", "Error", JOptionPane.ERROR_MESSAGE);
+                        }
+                    }
+                });
+
+                dialogUpdateRow.setSize(400, 200);
+                dialogUpdateRow.setLocationRelativeTo(null);
+                dialogUpdateRow.setVisible(true);
             }
         });
 
@@ -364,9 +455,17 @@ public class FlightBookingApp {
                 dialogDeleteRow.setSize(300, 150);
                 dialogDeleteRow.setLocationRelativeTo(null);
                 dialogDeleteRow.setVisible(true);
-
             }
         });
+    }
+
+    private static double calculatePrice(String flightDay, int numTickets) {
+        double pricePerTicket = 100.00; // Sample price
+        if (flightDay.equals("Saturday") || flightDay.equals("Sunday")) {
+            pricePerTicket *= 1.2; // Increase price by 20% on weekends
+        }
+        double totalPrice = pricePerTicket * numTickets;
+        return totalPrice;
     }
 
     private static void taruhKomponen(JComponent comp, JPanel panel, int gridx, int gridy, int gridwidth, int gridheight) {
