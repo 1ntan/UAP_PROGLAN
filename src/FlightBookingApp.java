@@ -3,7 +3,7 @@ import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.text.SimpleDateFormat;
+import java.text.SimpleDateFormat; //java api
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -245,6 +245,7 @@ public class FlightBookingApp {
             }
         });
 
+        //button tiket
         bookTicketButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -276,6 +277,8 @@ public class FlightBookingApp {
                 menuFrame.setVisible(true);
             }
         });
+
+        //action chekinbutton submit
         checkInButtonSubmit.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -332,9 +335,11 @@ public class FlightBookingApp {
                         String ticketCode = "TK" + (int) (Math.random() * 1000000);
                         double totalPrice = calculatePrice(flightDay, numTickets);
 
+                        //create (CRUD)
                         String[] row = {name, departure, destination, flightClass, airline, flightDay,
                                 new SimpleDateFormat("yyyy-MM-dd").format(flightDate), flightTime,
                                 String.valueOf(numTickets), String.valueOf(totalPrice), ticketCode};
+                        //read (menampilkan ketabel untuk dibaca)
                         tableModel.addRow(row);
 
                         // Store the booking data
@@ -344,6 +349,8 @@ public class FlightBookingApp {
                         nameField.setText("");
                         ticketField.setText("");
                         timeField.setText("");
+
+                        //exception Handling
                     } catch (NumberFormatException nfe) {
                         JOptionPane.showMessageDialog(null, "Number of tickets must be numeric");
                     } catch (Exception exc) {
@@ -353,6 +360,7 @@ public class FlightBookingApp {
             }
         });
 
+        //button update
         updateButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -386,6 +394,7 @@ public class FlightBookingApp {
 
                 dialogUpdateRow.add(buttonUpdate);
 
+                //Fitur Update
                 buttonUpdate.addActionListener(new ActionListener() {
                     @Override
                     public void actionPerformed(ActionEvent e) {
@@ -441,6 +450,7 @@ public class FlightBookingApp {
             }
         });
 
+        //fitur delete
         deleteButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
