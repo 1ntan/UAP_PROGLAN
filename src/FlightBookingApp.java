@@ -42,7 +42,7 @@ public class FlightBookingApp {
         menuFrame.setLocationRelativeTo(null);
 
         JPanel panelPilih = new JPanel() {
-            private final Image backgroundImage = new ImageIcon("D:\\KULIAH\\S3 24\\PEMROGRAMAN LANJUT\\PRAKTIKUM\\Modul5\\Tugas\\Gambar\\aya_goreng.jpg").getImage();
+            private final Image backgroundImage = new ImageIcon("C:\\Users\\User\\Pictures\\prolan\\photo_2024-12-27_21-20-08.jpg").getImage();
 
             @Override
             protected void paintComponent(Graphics g) {
@@ -205,6 +205,7 @@ public class FlightBookingApp {
         checkInFrame.getContentPane().setBackground(new Color(52, 73, 94)); // Dark gray background
         checkInFrame.setLocationRelativeTo(null);
 
+
         JPanel checkInPanel = new JPanel(new GridBagLayout());
         checkInPanel.setBackground(new Color(52, 73, 94));
 
@@ -273,6 +274,39 @@ public class FlightBookingApp {
             public void actionPerformed(ActionEvent e) {
                 checkInFrame.setVisible(false);
                 menuFrame.setVisible(true);
+            }
+        });
+        checkInButtonSubmit.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                String checkInName = checkInNameField.getText().trim();
+                String bookingCode = bookingCodeField.getText().trim();
+
+                if (checkInName.isEmpty() || bookingCode.isEmpty()) {
+                    JOptionPane.showMessageDialog(null, "Data cannot be empty", "Error", JOptionPane.ERROR_MESSAGE);
+                } else {
+                    if (bookingData.containsKey(bookingCode)) {
+                        // Retrieve booking data
+                        String[] bookingDetails = bookingData.get(bookingCode);
+                        String passengerName = bookingDetails[0];
+                        String flightDetails = "Flight from " + bookingDetails[1] + " to " + bookingDetails[2] + " on " +
+                                bookingDetails[5] + " (" + bookingDetails[6] + ") with " + bookingDetails[3] + " class via " +
+                                bookingDetails[4] + " airline";
+
+                        // Check if the passenger name matches
+                        if (checkInName.equals(passengerName)) {
+                            // Successful check-in
+                            JOptionPane.showMessageDialog(null, "Check-in Successful!\n" + flightDetails, "Success", JOptionPane.INFORMATION_MESSAGE);
+                            checkInFrame.setVisible(false);
+                            menuFrame.setVisible(true); // Return to menu after check-in
+                        } else {
+                            // Name mismatch
+                            JOptionPane.showMessageDialog(null, "Name does not match the booking", "Error", JOptionPane.ERROR_MESSAGE);
+                        }
+                    } else {
+                        JOptionPane.showMessageDialog(null, "Booking code not found", "Error", JOptionPane.ERROR_MESSAGE);
+                    }
+                }
             }
         });
 
